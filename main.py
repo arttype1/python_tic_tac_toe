@@ -1,11 +1,16 @@
 #A simple tic -tac-toe game
 #all code by George A. Merrill (except where otherwise noted)
 ########################################################################################################################
+#version 0.0.3 June 6th 2018
+#computer now takes obvious moves, like winning and blocking
+#looks like thats as 'smart' as it needs to be to not lose
+########################################################################################################################
 #version 0.0.2 June  6th 2018
 #added check that human player's move is legal
 #cleanaed up code so there are no nested while loops
 #######################################################################################################################
 from graphics import * #graphics.py by John Zelle
+import copy
 def drawX(win, p):
     x = p.getX()
     y = p.getY()
@@ -98,15 +103,28 @@ def turnO(myboard, mywin): #player's move
 def turnX(myboard, mywin): #computer's move
     x = 0
     y = 0
-    while (myboard[y][x] != 0):
+    stop = False
+    while (myboard[y][x] != 0 and stop == False):
+        #find the first empty box (as defult move)
         if x < 2: x += 1
         else:
             x = 0
             y += 1
-        if (y > 2 and x >2):
-            message = Text(Point(mywin.getWidth() /2, 50),'the game is a draw...')
-            message.draw(mywin)
-            return (3,3)
+    for i in range(3):
+        for j in range(3):
+            if (myboard[j][i] == 0 and stop == False):
+                myboard[j][i] = -1
+                if checkWin(myboard, -1):
+                    x = i
+                    y = j
+                myboard[j][i] = 1
+                if checkWin(myboard, 1):
+                    x = i
+                    y = j
+                    myboard[j][i]= 0
+                    stop = True
+                    break
+                myboard[j][i]= 0
     return [x, y]
 def init(myboard,mywin):
     board = [[0, 0, 0],[0, 0, 0],[0, 0, 0]]
@@ -156,23 +174,24 @@ def main():
     message.undraw()
 
     while gameDone == False:
+        if board[0].count(0) + board[1].count(0) + board[2].count(0) == 0:
+            message = Text(Point(win.getWidth() / 2, 50), 'the game is a draw...')
+            message.setFill('black')
+            message.draw(win)
+            gameDone =True
+            break
         xy = turnX(board, win)
         x = xy[0]
         y = xy[1]
-        print ("TurnX, x= "+repr(x)+" y= " + repr(y))
-        if (x + y == 6):
-            gameDone = True
-            break
-        else:
-            comPoint = getP(x,y)
-            drawX(win, comPoint)
-            board[y][x] = 1
-            if (checkWin(board, 1)):
-                message = Text(Point(win.getWidth() / 2, 50), 'X Wins!!!')
-                message.setFill('red')
-                message.draw(win)
-                gameDone = True
-                break
+        comPoint = getP(x,y)
+        drawX(win, comPoint)
+        board[y][x] = 1
+        if (checkWin(board, 1)):
+               message = Text(Point(win.getWidth() / 2, 50), 'X Wins!!!')
+               message.setFill('red')
+               message.draw(win)
+               gameDone = True
+               break
         if board[0].count(0) + board[1].count(0) + board[2].count(0) == 0:
             message = Text(Point(win.getWidth() / 2, 50), 'the game is a draw...')
             message.setFill('black')
