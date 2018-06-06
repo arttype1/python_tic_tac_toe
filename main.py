@@ -3,7 +3,6 @@
 ########################################################################################################################
 #version 0.0.3 June 6th 2018
 #computer now takes obvious moves, like winning and blocking
-#looks like thats as 'smart' as it needs to be to not lose
 ########################################################################################################################
 #version 0.0.2 June  6th 2018
 #added check that human player's move is legal
