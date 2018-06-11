@@ -1,15 +1,18 @@
 #A simple tic -tac-toe game
 #all code by George A. Merrill (except where otherwise noted)
 ########################################################################################################################
+# version 0.0.4 June 11th 2018
+# computer now wieghs all possible moves
+########################################################################################################################
 #version 0.0.3 June 6th 2018
 #computer now takes obvious moves, like winning and blocking
 ########################################################################################################################
 #version 0.0.2 June  6th 2018
 #added check that human player's move is legal
-#cleanaed up code so there are no nested while loops
+#cleaned up code so there are no nested while loops
 #######################################################################################################################
 from graphics import * #graphics.py by John Zelle
-import copy
+
 def drawX(win, p):
     x = p.getX()
     y = p.getY()
@@ -99,36 +102,47 @@ def turnO(myboard, mywin): #player's move
                 drawO(mywin, p)
                 myboard[2 - find(y)][find(x)] = -1
                 valid = True
+
+def getW(myboard, x,y):
+    tot = 0
+    for i in range(3):
+        for j in range(3):
+            postMan = (abs(j - x) + abs(i - y))
+            if ((postMan == 1) or (postMan == 2) or (postMan == 4)):
+                # a postan distance of 3 is not in same 'row'
+                t = (myboard[j][i] + 1)
+                tot += t
+    return tot
 def turnX(myboard, mywin): #computer's move
     x = 0
     y = 0
-    stop = False
-    while (myboard[y][x] != 0 and stop == False):
-        #find the first empty box (as defult move)
-        if x < 2: x += 1
-        else:
-            x = 0
-            y += 1
+    maxW = -1
     for i in range(3):
         for j in range(3):
-            if (myboard[j][i] == 0 and stop == False):
-                myboard[j][i] = -1
-                if checkWin(myboard, -1):
-                    x = i
-                    y = j
-                myboard[j][i] = 1
-                if checkWin(myboard, 1):
-                    x = i
-                    y = j
+            if (myboard[j][i] == 0):
+                    gW = getW(myboard, i, j)
+                    print(' cords = ' + repr(j) + ',' + repr(i) + 'gw=' + repr(gW))
+                    if gW > maxW:
+                        x = i
+                        y = j
+                        maxW = gW
+                    myboard[j][i] = -1
+                    if checkWin(myboard, -1):
+                        x = i
+                        y = j
+                    myboard[j][i] = 1
+                    if checkWin(myboard, 1):
+                        myboard[j][i] = 0
+                        x = i
+                        y = j
+                        return [x, y]
                     myboard[j][i]= 0
-                    stop = True
-                    break
-                myboard[j][i]= 0
+
     return [x, y]
 def init(myboard,mywin):
-    board = [[0, 0, 0],[0, 0, 0],[0, 0, 0]]
-
-    mywin.update()
+    for i in range(3):
+        for j in range(3):
+            myboard[j][i] = 0
     # <editor-fold desc="draw the board">
     vbar0 = Line(Point(100,100), Point(100,400)) #left side of box
     vbar0.setWidth(10)
@@ -185,6 +199,9 @@ def main():
         comPoint = getP(x,y)
         drawX(win, comPoint)
         board[y][x] = 1
+        print(board[0])
+        print(board[1])
+        print(board[2])
         if (checkWin(board, 1)):
                message = Text(Point(win.getWidth() / 2, 50), 'X Wins!!!')
                message.setFill('red')
